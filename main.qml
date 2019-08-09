@@ -44,6 +44,30 @@ Window {
             }
             onAccepted: globalStates.state = "condition"
         }
+        Button{
+            id: reset
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            Layout.minimumHeight: 100
+            Layout.minimumWidth: 200
+            height: parent.height/11
+            text: "Postition Robot"
+            onPressedChanged: {
+                if(pressed){
+                    publisher.text = "reset-robot"
+                }
+            }
+        }
+    }
+
+    Label{
+        id: statusMessage
+        visible: conditionGrid.visible
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: parent.top
+        anchors.topMargin: parent.height/10
+        text:"Please select a condition"
+        font.pixelSize: 40
+        color: "steelblue"
     }
 
     GridLayout{
@@ -58,6 +82,19 @@ Window {
         columns: 2
         property int buttonHeight: 100
         property int buttonWidth: 250
+        Component {
+            id: buttonStyle
+            ButtonStyle {
+                label: Text {
+                    renderType: Text.NativeRendering
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    font.family: "Helvetica"
+                    font.pointSize: 20
+                    text: control.text
+                    }
+                }
+        }
         Button{
             id: rotate_slide
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -65,6 +102,7 @@ Window {
             Layout.minimumWidth: conditionGrid.buttonWidth
             height: parent.height/11
             text: "Rotate Slide"
+            style: buttonStyle
             onPressedChanged: {
                 if(pressed){
                     publisher.text = "launch-"+particpantId.text+"-step_slide"
@@ -78,6 +116,7 @@ Window {
             Layout.minimumWidth: conditionGrid.buttonWidth
             height: parent.height/11
             text: "Rotate Stop"
+            style: buttonStyle
             onPressedChanged: {
                 if(pressed){
                     publisher.text = "launch-"+particpantId.text+"-step_stop"
@@ -91,6 +130,7 @@ Window {
             Layout.minimumWidth: conditionGrid.buttonWidth
             height: parent.height/11
             text: "Face Slide"
+            style: buttonStyle
             onPressedChanged: {
                 if(pressed){
                     publisher.text = "launch-"+particpantId.text+"-move_slide"
@@ -104,6 +144,7 @@ Window {
             Layout.minimumWidth: conditionGrid.buttonWidth
             height: parent.height/11
             text: "Face Stop"
+            style: buttonStyle
             onPressedChanged: {
                 if(pressed){
                     publisher.text = "launch-"+particpantId.text+"-move_stop"
@@ -160,5 +201,22 @@ Window {
     RosStringPublisher {
         id: publisher
         topic: "/interaction_commands"
+    }
+    RosStringSubscriber {
+        id: subscriber
+        topic: "/interaction_events"
+        onTextChanged:{
+            if(text === "start"){
+                statusMessage.text = "Waiting to go to position"
+            }
+            if(text === "patroller-waiting"){
+                statusMessage.text = "Ready"
+            }
+            if(text === "planner-stop"){
+                statusMessage.text = "Please select a condition"
+            }
+
+
+        }
     }
  }
