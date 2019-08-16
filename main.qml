@@ -242,10 +242,12 @@ Window {
             height: parent.height/11
             text: "Face Stop"
             property var message: "launch-"+particpantId.text+"-step_slide"
+            property bool wasPressed : false
             style: buttonStyle
             onPressedChanged: {
                 if(pressed){
                     startCondition(message)
+                    wasPressed = true
                 }
             }
         }
@@ -301,7 +303,16 @@ Window {
             border.width: 5
             MouseArea{
                 anchors.fill: parent
-                onClicked: { publisher.text="stop" }
+                onClicked: { publisher.text="stop"
+                    button1.enabled = true
+                    button1.opacity = 1
+                    button2.enabled = true
+                    button2.opacity = 1
+                    button3.enabled = true
+                    button3.opacity = 1
+                    button4.enabled = true
+                    button4.opacity = 1
+                }
             }
             Label{
                 anchors.fill: parent
@@ -336,7 +347,14 @@ Window {
                           script: {
                               conditionGrid.visible = true
                               intro.visible = false
-                              var order = orders[parseInt(particpantId.text)%orders.length]
+                              var partId=parseInt(particpantId.text)%orders.length
+                              console.log(partId)
+                              if(isNaN(partId)){
+                                  partId = 1
+                              }
+                              console.log(partId)
+
+                              var order = orders[partId]
 
                               button1.text = conditions[order[0]]
                               button1.message = "launch-"+particpantId.text+"-"+messages[order[0]]
@@ -365,6 +383,9 @@ Window {
             }
             if(text === "patrol-waiting"){
                 statusMessage.text = "Ready"
+            }
+            if(text === "patrol-moving"){
+                statusMessage.text = "Robot moving"
             }
             if(text === "planner-stop"){
                 statusMessage.text = "Please select a condition"
